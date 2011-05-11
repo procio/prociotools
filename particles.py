@@ -1,10 +1,11 @@
+import math
 from random import randint, random
 
 from pymt import *
 
 class Particle(object):
     _pool = []
-    __slots__ = ["x", "y", "dx", "dy", "radius", "R", "G", "B"]
+    __slots__ = ["x", "y", "dx", "dy", "radius", "phase", "R", "G", "B"]
     
     @staticmethod
     def draw_all():
@@ -13,7 +14,7 @@ class Particle(object):
     
     def draw(self):
         set_color(self.R, self.G, self.B)
-        drawCircle(pos=(self.x, self.y), radius=self.radius)
+        drawCircle(pos=(self.x, self.y), radius=self.radius*math.sin(getClock().get_time()+self.phase))
     
     def __init__(self):
         self._pool.append(self)
@@ -35,7 +36,8 @@ class ParticleWidget(MTWidget):
         p = Particle()
         p.x, p.y = randint(1, self.width), randint(1, self.height)
         p.dx, p.dy = randint(-10,10), randint(-10,10)
-        p.radius = randint(1,30)
+        p.radius = 30
+        p.phase = randint(0,2)
         p.R , p.G, p.B = random(), random(), random()
     
     def update_particle(self, p):
