@@ -1,7 +1,7 @@
 from pymt import *
 
 class ParticleWidget(MTWidget):
-    def __init__(self):
+    def __init__(self, particles=8, borders=True, collision=False):
         MTWidget.__init__(self)
         # robe con la coda a striscie
     
@@ -21,6 +21,7 @@ class ParticleWidget(MTWidget):
         # hai touch.pos (tupla di x,y)
         #     touch.dpos (posizione precedente)
         #     touch.opos (posizione iniziale)
+        #     touch.spos (posizione in coordinate [0,1])
     
     def on_touch_move(self touch):
         pass
