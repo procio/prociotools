@@ -1,44 +1,55 @@
 import math
-from random import randint, random
+from random import randint, random, choice
 
 from pymt import *
 
-class Particle(object):
+class CircularParticle(object):
     _pool = []
-    __slots__ = ["x", "y", "dx", "dy", "radius", "phase", "R", "G", "B"]
+    __slots__ = ["x", "y", "dx", "dy", "radius", "phase", "R", "G", "B", "A"]
     
     @staticmethod
     def draw_all():
-        for p in Particle._pool:
+        for p in CircularParticle._pool:
             p.draw()
+
+    @staticmethod
+    def random_particle():
+        p = CircularParticle()
+        p.x, p.y = random(), random()
+        p.dx, p.dy = random(), random()
+        p.radius = 30
+        p.phase = random()*2
+        p.R , p.G, p.B, p.A = random(), random(), random(), random()
+        return p
+    
+    @staticmethod
+    def new_particle():
+        return CircularParticle()
     
     def draw(self):
-        set_color(self.R, self.G, self.B)
+        set_color(self.R, self.G, self.B, self.A)
         drawCircle(pos=(self.x, self.y), radius=self.radius*math.sin(getClock().get_time()+self.phase))
     
     def __init__(self):
         self._pool.append(self)
 
 class ParticleWidget(MTWidget):
-    def __init__(self, particles=16, borders=False, collision=False):
+    def __init__(self, particles=16, borders=False, collision=False, particle_type = CircularParticle):
         MTWidget.__init__(self)
         self.particles = particles
         self.borders = borders
         self.collision = collision
-        
-        self._pool = Particle._pool
+        self.particle_type = particle_type
+        self._pool = particle_type._pool
     
     def init_particles(self):
         for i in xrange(self.particles):
-            self.new_particle()
-    
-    def new_particle(self):
-        p = Particle()
-        p.x, p.y = randint(1, self.width), randint(1, self.height)
-        p.dx, p.dy = randint(-10,10), randint(-10,10)
-        p.radius = 30
-        p.phase = randint(0,2)
-        p.R , p.G, p.B = random(), random(), random()
+            p = self.particle_type.random_particle()
+            p.x = int(p.x * self.width)
+            p.y = int(p.y * self.height)
+            p.dx = int(p.dx * 10 * choice([-1,1]))
+            p.dy = int(p.dy * 10 * choice([-1,1]))
+            
     
     def update_particle(self, p):
         p.x += p.dx
@@ -69,7 +80,7 @@ class ParticleWidget(MTWidget):
     
     # chiamata ogni frame
     def draw(self):
-        Particle.draw_all()
+        self.particle_type.draw_all()
     
     def on_touch_down(self, touch):
         # robe con la coda a striscie
